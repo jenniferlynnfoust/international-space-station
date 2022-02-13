@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+   crossorigin=""></script>
+   <style>
+      #issMap { height: 300px; }
+   </style>
+
+   <title>Lat &amp; Long</title>
+</head>
+<body>
+<h1>Where is the ISS?</h1>
+<p>The latitude: <span id="lat"></span><br/>
+   The longitude: <span id="lon"></span>
+</p>
+
+<div id="issMap"></div>
+
+<p>
+   Tutorial: <a href="https://www.youtube.com/watch?v=uxf0--uiX0I&t=0s">https://www.youtube.com/watch?v=uxf0--uiX0I&t=0s</a><br/>
+   Data: <a href="https://wheretheiss.at/">https://wheretheiss.at/</a><br/>
+   Map stuff: <a href="https://leafletjs.com/">https://leafletjs.com/</a>
+</p>
+<script>
+   // Making a map and tiles
+   const map = L.map('issMap').setView([0, 0], 1);
+   const attribution =
+         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+   const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+   const tiles = L.tileLayer(tileUrl, { attribution });
+   tiles.addTo(map);
+
+   // Making custom marker
+   const issIcon = L.icon({
+    iconUrl: 'iss200.png',
+    iconSize: [50, 32],
+    iconAnchor: [25, 16],
+   });
+   // Adding marker to map
+   const marker = L.marker([0, 0], { icon: issIcon }).addTo(map);
+   //const marker = L.marker([0, 0]).addTo(map);
+   
+   const api_url = 'https://api.wheretheiss.at/v1/satellites/25544';
+
+   async function getISS(){
+      const response = await fetch(api_url);
+      const data = await response.json();
+      
+      const {latitude, longitude} = data;
+
+      marker.setLatLng([latitude, longitude]);
+
+      document.getElementById('lat').textContent = latitude;
+      document.getElementById('lon').textContent = longitude;
+
+      console.log(longitude);
+      console.log(latitude);
+
+   }
+   
+   getISS();
+   
+</script>
+</body>
+</html>
+
